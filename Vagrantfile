@@ -8,6 +8,6 @@ Vagrant.configure("2") do |config|
         #ansible.extra_vars = "ansible_extra_vars.yml"
         #ansible.vault_password_file="~/.vault_pass.txt"
         
-        ansible.playbook = "/Users/evox/Google Drive/yortuc/side projects/airflow_playbook/install_airflow.yaml"
+        ansible.playbook = "install_airflow.yaml"
   end
 end
