@@ -1,0 +1,39 @@
+# Install Apache Airflow
+---
+- name: AirflowSetup
+  hosts: all
+  become: yes
+  gather_facts: False
+
+  environment:
+    AIRFLOW_GPL_UNIDECODE: yes
+
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: False
+    - setup: # aka gather_facts
+
+    - name: Install packages
+      apt:
+        pkg:
+          - htop
+          - git
+          - python-pip
+        state: present
+
+    - pip:
+        name: apache-airflow 
+        state: latest
+
+    - name: Create user
+      user:
+        name: "airflow"
+        comment: "Used to deploy airflow"
+        state: present
+      
+    - name: Create .ssh folder
+      file:
+        path: "/home/airflow/.ssh/"
+        state: directory
+        mode: 0755
