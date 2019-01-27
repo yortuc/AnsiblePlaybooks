@@ -1,0 +1,41 @@
+---
+- name: JupyterSetup
+  hosts: all
+  become: yes
+  gather_facts: False
+
+  pre_tasks:
+  - name: Install python for Ansible
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    changed_when: False
+  
+  - setup: # aka gather_facts
+
+  - name: Install packages
+    apt:
+      pkg:
+        - htop
+        - git
+        - python-pip
+      state: present
+
+  - pip:
+      name: jupyter
+      state: latest 
+
+  - name: Create user
+    user:
+      name: "jupyter"
+      state: present
+
+  - name: Start Jupyter notebook
+    shell: nohup jupyter notebook --ip="0.0.0.0" </dev/null >/dev/null 2>&1 & sleep 10
+    become_user: "jupyter"
+
+  - name: get token for jupyter notebook
+    shell: jupyter notebook list | grep -v "Currently" | awk '{print $1}'
+    become_user: "jupyter"
+    register: jupyter_notebook_url
+
+  - debug:
+      msg: "notebook running {{ jupyter_notebook_url.stdout }}"
